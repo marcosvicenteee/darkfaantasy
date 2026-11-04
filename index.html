@@ -1,0 +1,126 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wallpaper Text Generator</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A8%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Bangers&family=Bebas+Neue&family=Luckiest+Guy&family=Lilita+One&family=Oswald:wght@700&family=Permanent+Marker&family=Righteous&family=Titan+One&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=3">
+</head>
+<body>
+
+<nav class="topbar">
+  <div class="topbarInner">
+    <span class="brand">✨ Wallpaper Text Generator</span>
+    <div class="navLinks">
+      <a class="navBtn mp4" href="https://snaptik.fi/es/download-tiktok-video" target="_blank" rel="noopener noreferrer">
+        <span class="navIcon">🎬</span> MP4
+      </a>
+      <a class="navBtn fotos" href="https://snaptik.fi/es/download-tiktok-photo-slideshow" target="_blank" rel="noopener noreferrer">
+        <span class="navIcon">🖼️</span> FOTOS
+      </a>
+      <a class="navBtn togif" href="https://convertio.co/es/mov-gif/" target="_blank" rel="noopener noreferrer">
+        <span class="navIcon">🔄</span> TO GIF
+      </a>
+    </div>
+  </div>
+</nav>
+
+<header>
+  <h1>✨ Wallpaper Text Generator</h1>
+  <p>Sube un vídeo, GIF o imagen y crea una portada animada.</p>
+</header>
+
+<main>
+  <section class="controls">
+    <label class="upload">
+      <span>🎬 Fondo (vídeo / GIF / imagen)</span>
+      <input id="fileInput" type="file" accept="video/*,image/gif,image/*">
+    </label>
+
+    <div class="grid">
+      <label>Texto superior<input id="topInput" type="text" value="HIGH QUALITY"></label>
+      <label>Texto principal<input id="mainInput" type="text" value="WALLPAPERS"></label>
+      <label>Texto medio<input id="midInput" type="text" value="PREVIEW + LIVE"></label>
+      <label>Texto inferior<input id="bottomInput" type="text" value="DARK FANTASY"></label>
+    </div>
+
+    <div class="group">
+      <h3>Tipografía de cada texto</h3>
+
+      <div class="typoRow">
+        <span>Superior</span>
+        <select id="font-top" aria-label="Tipografía del texto superior"></select>
+        <input id="size-top" type="range" min="60" max="170" value="100" aria-label="Tamaño del texto superior">
+        <output id="out-size-top">100%</output>
+      </div>
+
+      <div class="typoRow">
+        <span>Principal</span>
+        <select id="font-main" aria-label="Tipografía del texto principal"></select>
+        <input id="size-main" type="range" min="60" max="170" value="100" aria-label="Tamaño del texto principal">
+        <output id="out-size-main">100%</output>
+      </div>
+
+      <div class="typoRow">
+        <span>Medio</span>
+        <select id="font-mid" aria-label="Tipografía del texto medio"></select>
+        <input id="size-mid" type="range" min="60" max="170" value="100" aria-label="Tamaño del texto medio">
+        <output id="out-size-mid">100%</output>
+      </div>
+
+      <div class="typoRow">
+        <span>Inferior</span>
+        <select id="font-bottom" aria-label="Tipografía del texto inferior"></select>
+        <input id="size-bottom" type="range" min="60" max="170" value="100" aria-label="Tamaño del texto inferior">
+        <output id="out-size-bottom">100%</output>
+      </div>
+    </div>
+
+    <div class="row">
+      <label>Color principal <input id="colorPicker" type="color" value="#e32924"></label>
+      <button id="autoColor">🎨 Color que combina</button>
+    </div>
+
+    <div class="row">
+      <label>Movimiento
+        <input id="motionRange" type="range" min="0" max="10" value="2">
+      </label>
+      <label>Zoom fondo
+        <input id="zoomRange" type="range" min="100" max="130" value="100">
+      </label>
+    </div>
+
+    <button class="export" id="exportBtn">⬇️ EXPORTAR VÍDEO MP4</button>
+    <button class="reset" id="resetBtn">↺ Restaurar plantilla</button>
+    <p id="exportStatus" class="exportStatus"></p>
+
+    <div id="result" class="result" hidden>
+      <video id="resultVideo" controls playsinline preload="metadata"></video>
+      <a id="downloadLink" class="downloadBtn" download>⬇️ Descargar MP4</a>
+      <p id="resultInfo" class="resultInfo"></p>
+    </div>
+  </section>
+
+  <section class="stageWrap">
+    <div id="stage" class="stage">
+      <div id="background"></div>
+      <div class="shade"></div>
+
+      <div id="topText" class="text white top">HIGH QUALITY</div>
+      <div id="mainText" class="text main">WALLPAPERS</div>
+      <div id="midText" class="text white mid">PREVIEW + LIVE</div>
+      <div id="bottomText" class="text main small">DARK FANTASY</div>
+    </div>
+
+    <p class="hint">El texto tiene un movimiento suave y continuo. La plantilla está en formato 9:16 y se exporta en MP4 H.264 (1080×1920), listo para CapCut.</p>
+  </section>
+</main>
+
+<script src="vendor/omggif.js"></script>
+<script src="app.js?v=4"></script>
+</body>
+</html>
