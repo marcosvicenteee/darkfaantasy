@@ -658,6 +658,41 @@ function showResult(blob, filename, isMp4) {
   try { link.click(); } catch (e) {}
 }
 
+/* Espera a que el vídeo tenga un frame decodificado */
+function waitForVideoFrame(video, timeout = 3000) {
+  return new Promise(resolve => {
+    if (video.readyState >= 2 && video.videoWidth) return resolve();
+
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      video.removeEventListener("loadeddata", finish);
+      video.removeEventListener("seeked", finish);
+      video.removeEventListener("canplay", finish);
+      clearTimeout(timer);
+      resolve();
+    };
+
+    const timer = setTimeout(finish, timeout);
+    video.addEventListener("loadeddata", finish);
+    video.addEventListener("seeked", finish);
+    video.addEventListener("canplay", finish);
+  });
+}
+
+/* Deja pasar N frames de animación (para que el encoder capture lo ya pintado) */
+function nextAnimationFrames(n = 2) {
+  return new Promise(resolve => {
+    let i = 0;
+    const step = () => {
+      if (++i >= n) resolve();
+      else requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
+}
+
 exportBtn.addEventListener("click", async () => {
   const media = background.querySelector("video,img");
   if (!media) {
@@ -687,6 +722,35 @@ exportBtn.addEventListener("click", async () => {
     canvas.height = CANVAS_H;
     const ctx = canvas.getContext("2d");
 
+    const period = motionPeriod();
+
+    let duration;
+    if (gif.reader) {
+      // El GIF se exporta entero (una vuelta completa); si es muy corto,
+      // se repite el bucle hasta 2 s para que sea usable.
+      duration = Math.max(gif.total / 1000, 2);
+    } else if (media.tagName === "VIDEO") {
+      duration = Math.min(Math.max(media.duration || 5, 3), 15);
+    } else {
+      duration = 5;
+    }
+
+    /* --- 1. Preparar la fuente --- */
+    if (media.tagName === "VIDEO") {
+      try {
+        media.pause();
+        media.muted = true;
+        media.currentTime = 0;
+        await waitForVideoFrame(media);
+      } catch (e) {}
+    } else if (typeof media.decode === "function") {
+      try { await media.decode(); } catch (e) {}
+    }
+
+    /* --- 2. Pintar el primer frame ANTES de crear el stream ---
+       Si el grabador arranca con el canvas vacío, el vídeo empieza en negro. */
+    renderFrame(ctx, media, 0, period);
+
     const stream = canvas.captureStream(30);
 
     let recorder;
@@ -703,25 +767,16 @@ exportBtn.addEventListener("click", async () => {
     recorder.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
     const done = new Promise(resolve => { recorder.onstop = resolve; });
 
-    const period = motionPeriod();
-
-    let duration;
-    if (gif.reader) {
-      // El GIF se exporta entero (una vuelta completa); si es muy corto,
-      // se repite el bucle hasta 2 s para que sea usable.
-      duration = Math.max(gif.total / 1000, 2);
-    } else if (media.tagName === "VIDEO") {
-      duration = Math.min(Math.max(media.duration || 5, 3), 15);
-    } else {
-      duration = 5;
-    }
-
     recorder.start(250);
-    const start = performance.now();
+
+    /* --- 3. Confirmar que el encoder ya tiene esa imagen y arrancar el reloj --- */
+    await nextAnimationFrames(2);
 
     if (media.tagName === "VIDEO") {
-      try { media.currentTime = 0; media.muted = true; await media.play(); } catch (e) {}
+      try { await media.play(); } catch (e) {}
     }
+
+    const start = performance.now();
 
     await new Promise(resolve => {
       function frame(now) {
