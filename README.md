@@ -45,6 +45,21 @@ server.js         servidor estático mínimo para Render (sin dependencias)
 
 El servidor escucha en `process.env.PORT` y sirve la carpeta del proyecto.
 
+## Auto-ping (evitar que Render duerma el servicio)
+
+En el plan free el servicio se duerme a los **15 min** sin visitas. `server.js` se hace una petición a sí mismo para mantenerse despierto:
+
+| Variable | Descripción | Por defecto |
+|---|---|---|
+| `SELF_URL` | URL pública del servicio, ej. `https://darkfaantasy.onrender.com` | `RENDER_EXTERNAL_URL` (Render la pone sola) |
+| `SELF_PING_MINUTES` | Minutos entre pings (`0` lo desactiva) | `10` |
+
+- Endpoint usado: `GET /__ping` → `200 ok` (no toca los archivos estáticos).
+- El primer ping se lanza a los 10 s de arrancar, luego cada 10 min.
+- **Sin configurar nada** funciona en Render, porque expone `RENDER_EXTERNAL_URL` automáticamente.
+- Ojo: el plan free tiene ~750 h/mes de instancia; mantenerlo 24/7 consume ~730 h. Si un mes haces despliegues o pruebas, te quedarás justo.
+
+
 
 ## Créditos
 

@@ -47,6 +47,11 @@ const server = http.createServer((req, res) => {
     return send(res, 400, "400 · URL no válida");
   }
 
+  // Endpoint ligero para el auto-ping
+  if (url === "/__ping") {
+    return send(res, 200, "ok", "text/plain; charset=utf-8");
+  }
+
   let filePath = path.resolve(ROOT, "." + url);
 
   // Nunca salir de la carpeta del proyecto
@@ -77,4 +82,57 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
   console.log("Sirviendo " + ROOT + " en el puerto " + PORT);
+  startSelfPing();
 });
+
+/* =========================================================
+   AUTO-PING (mantiene despierto el servicio free de Render,
+   que se duerme tras 15 minutos sin visitas)
+   Variables de entorno:
+     SELF_URL          -> URL pública (si no, usa RENDER_EXTERNAL_URL)
+     SELF_PING_MINUTES -> minutos entre pings (por defecto 10, 0 = off)
+   ========================================================= */
+
+function startSelfPing() {
+  const base = process.env.SELF_URL || process.env.RENDER_EXTERNAL_URL || "";
+  const minutes = Number(process.env.SELF_PING_MINUTES || 10);
+
+  if (!base) {
+    console.log("[ping] desactivado: define SELF_URL (o despliega en Render, que expone RENDER_EXTERNAL_URL)");
+    return;
+  }
+
+  if (!(minutes > 0)) {
+    console.log("[ping] desactivado: SELF_PING_MINUTES = " + minutes);
+    return;
+  }
+
+  let target;
+  try {
+    target = new URL("/__ping", base).toString();
+  } catch (e) {
+    console.warn("[ping] desactivado: SELF_URL no es una URL válida (" + base + ")");
+    return;
+  }
+
+  const every = minutes * 60 * 1000;
+
+  const ping = async () => {
+    const t0 = Date.now();
+    try {
+      const res = await fetch(target, {
+        signal: AbortSignal.timeout(15000),
+        headers: { "User-Agent": "self-ping" }
+      });
+      console.log("[ping] " + res.status + " " + target + " (" + (Date.now() - t0) + " ms)");
+    } catch (err) {
+      console.warn("[ping] error: " + err.message);
+    }
+  };
+
+  // primer ping cuando el servicio ya está arriba
+  setTimeout(ping, 10000).unref();
+  setInterval(ping, every).unref();
+
+  console.log("[ping] activo cada " + minutes + " min -> " + target);
+}
