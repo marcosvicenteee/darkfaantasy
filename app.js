@@ -414,8 +414,6 @@ $("fileInput").addEventListener("change", async e => {
   if (mediaURL) URL.revokeObjectURL(mediaURL);
   mediaURL = URL.createObjectURL(file);
 
-  if (!lockCustom) setLockBackground(file);
-
   resetGif();
   background.innerHTML = "";
 
@@ -449,54 +447,6 @@ $("fileInput").addEventListener("change", async e => {
   } else {
     exportStatus.textContent = "";
   }
-});
-
-/* =========================
-   RESULTADO · PANTALLA DE BLOQUEO
-   ========================= */
-
-const lockWall = $("lockWall");
-let lockURL = null;
-let lockCustom = false;
-
-function setLockBackground(file) {
-  if (!file) return;
-
-  if (lockURL) URL.revokeObjectURL(lockURL);
-  lockURL = URL.createObjectURL(file);
-
-  lockWall.innerHTML = "";
-
-  const isVideo = (file.type || "").startsWith("video/");
-  const el = document.createElement(isVideo ? "video" : "img");
-
-  if (isVideo) {
-    el.muted = true;
-    el.loop = true;
-    el.autoplay = true;
-    el.playsInline = true;
-  }
-  el.src = lockURL;
-  lockWall.appendChild(el);
-}
-
-function clearLockBackground() {
-  if (lockURL) { URL.revokeObjectURL(lockURL); lockURL = null; }
-  lockWall.innerHTML = "";
-}
-
-$("lockFile").addEventListener("change", e => {
-  const file = e.target.files[0];
-  if (!file) return;
-  lockCustom = true;
-  setLockBackground(file);
-});
-
-$("lockReset").addEventListener("click", () => {
-  lockCustom = false;
-  const file = $("fileInput").files[0];
-  if (file) setLockBackground(file);
-  else clearLockBackground();
 });
 
 /* =========================

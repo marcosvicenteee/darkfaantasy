@@ -26,21 +26,12 @@ Abre `index.html` en Chrome o Edge (o sírvelo con `python -m http.server 8000`)
 ## Estructura
 
 ```
-index.html        interfaz (generador + apartado Resultado)
-style.css         estilos (preview proporcional, pantalla de bloqueo)
+index.html        interfaz
+style.css         estilos (preview proporcional, preview del vídeo)
 app.js            lógica: tipografías, color automático, GIF y exportación
 vendor/omggif.js  decodificador de GIF (MIT, Dean McNamee)
 server.js         servidor estático mínimo para Render (sin dependencias)
 ```
-
-## Apartado «Resultado»
-
-Simulación de la pantalla de bloqueo del iPhone con **hora fija 7:77** y **31 de febrero**:
-
-- Fondo editable con imagen, GIF (animado) o vídeo.
-- Cristal líquido: reloj translúcido con borde luminoso y pastilla «Concentración» con `backdrop-filter`.
-- Se sincroniza con el fondo que subes al generador; el botón «Usar el fondo del generador» vuelve a esa sincronización.
-
 
 ## Despliegue en Render
 
