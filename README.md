@@ -30,7 +30,21 @@ index.html        interfaz
 style.css         estilos (incluye preview proporcional al vídeo)
 app.js            lógica: tipografías, color automático, GIF y exportación
 vendor/omggif.js  decodificador de GIF (MIT, Dean McNamee)
+server.js         servidor estático mínimo para Render (sin dependencias)
 ```
+
+## Despliegue en Render
+
+**Opción recomendada:** *New → Static Site*
+- Build Command: *(vacío)*
+- Publish Directory: `.`
+
+**Opción Web Service** (ya creado):
+- Build Command: `echo ok`
+- Start Command: `node server.js`
+
+El servidor escucha en `process.env.PORT` y sirve la carpeta del proyecto.
+
 
 ## Créditos
 

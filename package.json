@@ -1,0 +1,9 @@
+{
+  "name": "darkfaantasy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Wallpaper Text Generator: texto animado sobre video/GIF/imagen, exportado en MP4 1080x1920",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
